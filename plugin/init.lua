@@ -67,7 +67,7 @@ M.create_ws_and_execute_command = function(window, pane, cmd, id, label)
 		mux.spawn_window {
 			workspace = M.dir_name_from_path(label),
 			cwd = label,
-			args = { 'nvim' },
+			args = cmd,
 		}
 		-- Explicitly focus the new workspace
 		mux.set_active_workspace(M.dir_name_from_path(label))
@@ -96,7 +96,6 @@ M.setup = function(config, dirs, key, mods, cmd)
 		mods = mods,
 		action = wezterm.action_callback(function(window, pane)
 			local choices = M.choices_from_dirs(dirs)
-			wezterm.log_info(choices)
 
 			if not choices or #choices == 0 then
 				M.show_not_choices(window, pane)

@@ -63,14 +63,27 @@ end
 M.create_ws_and_execute_command = function(window, pane, cmd, id, label)
 	window:perform_action(wezterm.action_callback(function(_win, _pane)
 		local mux = wezterm.mux
+		local workspace_name = M.dir_name_from_path(label)
 
-		mux.spawn_window {
-			workspace = M.dir_name_from_path(label),
-			cwd = label,
-			args = cmd,
-		}
-		-- Explicitly focus the new workspace
-		mux.set_active_workspace(M.dir_name_from_path(label))
+		-- 1. Check if the workspace already exists
+		local workspace_exists = false
+		for _, name in ipairs(mux.get_workspace_names()) do
+			if name == workspace_name then
+				workspace_exists = true
+				break
+			end
+		end
+
+		if workspace_exists then
+			mux.set_active_workspace(workspace_name)
+		else
+			mux.spawn_window {
+				workspace = workspace_name,
+				cwd = label,
+				args = cmd,
+			}
+			mux.set_active_workspace(workspace_name)
+		end
 	end), pane)
 end
 
